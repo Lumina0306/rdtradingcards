@@ -492,8 +492,57 @@ function command.run(message, mt)
           url = 'https://cdn.discordapp.com/attachments/829197797789532181/829255830485598258/token.png'
         }
       }}
-    
-    
+    elseif string.lower(mt[1]) == "world map" or string.lower(mt[1]) == "map" then
+      -- TODO
+      if wj.ws < 501 then
+        message.channel:send{embed = {
+          color = 0x85c5ff,
+          title = "Looking at World Map...",
+          description = 'Pyrowmid',
+          image = {
+            url = 'https://cdn.discordapp.com/attachments/983354744980508752/1003212744604008448/1.png'
+          }
+        }}
+      elseif wj.ws >= 501 and wj.ws < 507 then
+        message.channel:send{embed = {
+          color = 0x85c5ff,
+          title = "Looking at World Map...",
+          description = 'Pyrowmid(with Hole)',
+          image = {
+            url = 'https://cdn.discordapp.com/attachments/983354744980508752/1003212744914374726/2.png'
+          }
+        }}
+      elseif wj.ws >= 507 and wj.ws < 702 then
+        if wj.labdiscovered then
+          message.channel:send{embed = {
+            color = 0x85c5ff,
+            title = "Looking at World Map...",
+            description = 'Pyrowmid(with Hole), Lab',
+            image = {
+              url = 'https://cdn.discordapp.com/attachments/983354744980508752/1003212745258303538/3.png'
+            }
+          }}
+        else
+          message.channel:send{embed = {
+            color = 0x85c5ff,
+            title = "Looking at World Map...",
+            description = 'Pyrowmid(with Hole)',
+            image = {
+              url = 'https://cdn.discordapp.com/attachments/983354744980508752/1003212744914374726/2.png'
+            }
+          }}
+        end
+      elseif wj.ws >= 702 then
+        message.channel:send{embed = {
+          color = 0x85c5ff,
+          title = "Looking at World Map...",
+          description = 'Pyrowmid(with Hole), Lab, Mountain, Shop',
+          image = {
+            url = 'https://cdn.discordapp.com/attachments/983354744980508752/1003212745572892762/4.png'
+          }
+        }}
+      end
+      
     else
       message.channel:send("Sorry, but I cannot find " .. mt[1] .. ".")
       uj.timeslooked = uj.timeslooked - 1
