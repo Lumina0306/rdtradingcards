@@ -11,6 +11,7 @@ function command.run(message, mt, overwrite)
   
   if authcheck then
     print("authcheck passed")
+    
     _G["privatestuff"] = dofile('privatestuff.lua')
 
     -- Lua implementation of PHP scandir function
@@ -135,7 +136,6 @@ function command.run(message, mt, overwrite)
       itemprice = 4
     }
     
-    
     _G['amtable'] = {
       pyrowmid = {"strange machine", "machine", "panda"},
       lab = {"mouse hole", "mouse", "mousehole", "peculiar box", "box", "peculiarbox", "terminal"},
@@ -168,10 +168,7 @@ function command.run(message, mt, overwrite)
     _G['nopeeking'] = false
     
     print("loading cards")
-	
-	
     --_G['cdata'] = dpf.loadjson("data/cards.json", defaultjson)
-	
     _G['cdata'] = {basemult = 4, groups = {}}
 	
     _G['jsonfiles']	= {}
@@ -399,8 +396,7 @@ function command.run(message, mt, overwrite)
       "z"
     }
     
-    print("loading functions")
-    
+    print("loading functions")  
     _G['trf'] = function (x,rep)
       if not rep then
         rep = {}
@@ -513,21 +509,21 @@ function command.run(message, mt, overwrite)
     end
 
     _G['ynbuttons'] = function(message, content, etype, data, userid, lang)
-    local messagecontent, messageembed
-	  local langfile = dpf.loadjson("langs/" .. lang .. "/ynbuttons.json", "")
+      local messagecontent, messageembed
+      local langfile = dpf.loadjson("langs/" .. lang .. "/ynbuttons.json", "")
 
-    if type(content) == "table" then
-      messageembed = content
-    else
-      messagecontent = content
-    end
+      if type(content) == "table" then
+        messageembed = content
+      else
+        messagecontent = content
+      end
 
-    print('making yesbutton')
-    local yesbutton = discordia.Button {
-      id = "yes",
-      label = langfile.button_yes,
-      style = "success"
-    }
+      print('making yesbutton')
+      local yesbutton = discordia.Button {
+        id = "yes",
+        label = langfile.button_yes,
+        style = "success"
+      }
       
       print("making nobutton")
       local nobutton = discordia.Button {
@@ -547,14 +543,14 @@ function command.run(message, mt, overwrite)
         local reactionid = userid or message.author.id
 
         if interaction.user.id ~= reactionid then
-		  local uj2 = dpf.loadjson("savedata/" .. interaction.user.id .. ".json", defaultjson)
-		  local langfile2 = dpf.loadjson("langs/" .. uj2.lang .. "/ynbuttons.json", "")
+          local uj2 = dpf.loadjson("savedata/" .. interaction.user.id .. ".json", defaultjson)
+          local langfile2 = dpf.loadjson("langs/" .. uj2.lang .. "/ynbuttons.json", "")
           interaction:reply(langfile2.cannot_interact, true)
         end
 
         return interaction.user.id == reactionid
       end)
-
+  
       newmessage:update{components = discordia.Components {yesbutton:disable(), nobutton:disable()}}
 
       if not pressed then
@@ -668,57 +664,57 @@ function command.run(message, mt, overwrite)
     addcommand("rtsitem",cmd.rtsitem)
     
     _G['handlemessage'] = function (message, content)
-	  if message.author.id ~= client.user.id or content then
-      local messagecontent = content or message.content
-      for i,v in ipairs(commands) do
-        if string.trim(string.lower(string.sub(messagecontent, 0, #v.trigger+1))) == v.trigger then
-          if not (message.author.bot == true) then
-          local uj = dpf.loadjson("savedata/" .. message.author.id .. ".json", defaultjson)
-          local sj = dpf.loadjson("savedata/shop.json",defaultshopsave)
-          if not sj.stocknum then
-            sj.stocknum = 1
-            dpf.savejson("savedata/shop.json",sj)
+      if message.author.id ~= client.user.id or content then
+        local messagecontent = content or message.content
+        for i,v in ipairs(commands) do
+          if string.trim(string.lower(string.sub(messagecontent, 0, #v.trigger+1))) == v.trigger then
+            if not (message.author.bot == true) then
+              local uj = dpf.loadjson("savedata/" .. message.author.id .. ".json", defaultjson)
+              local sj = dpf.loadjson("savedata/shop.json",defaultshopsave)
+              if not sj.stocknum then
+                sj.stocknum = 1
+                dpf.savejson("savedata/shop.json",sj)
+              end
+              if not uj.lang then
+                uj.lang = "en"
+              end
+              if not uj.pronouns["selection"] then
+                uj.pronouns["selection"] = uj.pronouns["they"]
+              end
+              if not uj.lastrob then
+                uj.lastrob = 0
+              end
+              dpf.savejson("savedata/" .. message.author.id .. ".json",uj)
+            end
+            print("found ".. v.trigger)
+            local mt = {}
+            local nmt = {}
+            if v.expectedargs == 0 then
+              mt = string.split(string.sub(messagecontent, #v.trigger+1),"/")
+              for a,b in ipairs(mt) do
+                b = string.trim(b)
+                nmt[a]=b
+              end
+            elseif v.expectedargs == 1 then
+              nmt = {string.trim(string.sub(messagecontent, #v.trigger+1))}
+            end --might have to expand later?
+            if v.force then
+              for c,d in ipairs(v.force) do
+                table.insert(nmt,c,d)
+              end
+            end
+            print("nmt: " .. inspect(nmt))
+            local status, err = pcall(function ()
+              v.commandfunction.run(message,nmt,v.usebypass,content)
+            end)
+            if not status then
+              print("uh oh")
+              message.channel:send("Oops! An error has occured! Error message: ```" .. err .. "``` (<@290582109750427648> <@298722923626364928> please fix this thanks)")
+            end
+            break
           end
-            if not uj.lang then
-              uj.lang = "en"
-            end
-            if not uj.pronouns["selection"] then
-              uj.pronouns["selection"] = uj.pronouns["they"]
-            end
-            if not uj.lastrob then
-              uj.lastrob = 0
-            end
-          dpf.savejson("savedata/" .. message.author.id .. ".json",uj)
-          end
-          print("found ".. v.trigger)
-          local mt = {}
-          local nmt = {}
-          if v.expectedargs == 0 then
-            mt = string.split(string.sub(messagecontent, #v.trigger+1),"/")
-            for a,b in ipairs(mt) do
-              b = string.trim(b)
-              nmt[a]=b
-            end
-          elseif v.expectedargs == 1 then
-            nmt = {string.trim(string.sub(messagecontent, #v.trigger+1))}
-          end --might have to expand later?
-          if v.force then
-            for c,d in ipairs(v.force) do
-              table.insert(nmt,c,d)
-            end
-          end
-          print("nmt: " .. inspect(nmt))
-          local status, err = pcall(function ()
-            v.commandfunction.run(message,nmt,v.usebypass,content)
-          end)
-          if not status then
-            print("uh oh")
-            message.channel:send("Oops! An error has occured! Error message: ```" .. err .. "``` (<@290582109750427648> <@298722923626364928> please fix this thanks)")
-          end
-          break
         end
       end
-    end
     end
     
     _G['getitemthumb'] = function(item,cons)
